@@ -18,7 +18,7 @@ router.register(r"categories", CategoryViewSet)
 urlpatterns = [
     path("", BlogListView.as_view(), name="blog_index"),
     path("api/", include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("posts/<int:pk>/", BlogDetailView.as_view(), name="blog_detail"),
     path("login", LoginView.as_view(template_name="login.html"), name="login"),
     path("logout", LogoutView.as_view(template_name="logout.html"), name="logout"),

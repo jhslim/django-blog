@@ -20,7 +20,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             "created_date",
             "modified_date",
             "published_date",
-            "categories"
+            "categories",
         ]
 
 

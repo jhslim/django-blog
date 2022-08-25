@@ -89,45 +89,43 @@ class RestApiTestCase(TestCase):
 
         for count in range(1, 11):
             post = Post(title="Post %d Title" % count, text="foo", author=author)
-            
+
             if count < 6:
                 # publish the first five posts
                 pubdate = self.now - self.timedelta * count
-                post.published_date = pubdate    
-                
+                post.published_date = pubdate
+
             post.save()
             category.posts.add(post)
             post.save()
 
-
     def test_returned_api_users(self):
         resp = self.client.get("/api/users/")
         resp_text = resp.content.decode(resp.charset)
-        json_text = json.loads(resp_text)['results']
-        self.assertTrue(json_text[0]['username'] == "admin")
-        self.assertTrue(json_text[0]['url'] == "http://testserver/users/1/")
-        self.assertTrue(json_text[1]['username'] == "noname")
-        self.assertTrue(json_text[1]['url'] == "http://testserver/users/2/")
+        json_text = json.loads(resp_text)["results"]
+        self.assertTrue(json_text[0]["username"] == "admin")
+        self.assertTrue(json_text[0]["url"] == "http://testserver/users/1/")
+        self.assertTrue(json_text[1]["username"] == "noname")
+        self.assertTrue(json_text[1]["url"] == "http://testserver/users/2/")
 
     def test_returned_api_posts(self):
         resp = self.client.get("/api/posts/")
         resp_text = resp.content.decode(resp.charset)
-        json_text = json.loads(resp_text)['results']
+        json_text = json.loads(resp_text)["results"]
         self.assertTrue(len(json_text) == 10)
         for post in json_text:
-            self.assertTrue('url' in post.keys())
-            self.assertTrue('title' in post.keys())
-            self.assertTrue('text' in post.keys())
-            self.assertTrue('author' in post.keys())
-            self.assertTrue('created_date' in post.keys())
-            self.assertTrue('modified_date' in post.keys())
-            self.assertTrue('published_date' in post.keys())
-            self.assertTrue('categories' in post.keys())
+            self.assertTrue("url" in post.keys())
+            self.assertTrue("title" in post.keys())
+            self.assertTrue("text" in post.keys())
+            self.assertTrue("author" in post.keys())
+            self.assertTrue("created_date" in post.keys())
+            self.assertTrue("modified_date" in post.keys())
+            self.assertTrue("published_date" in post.keys())
+            self.assertTrue("categories" in post.keys())
 
     def test_returned_api_categories(self):
         resp = self.client.get("/api/categories/")
         resp_text = resp.content.decode(resp.charset)
-        json_text = json.loads(resp_text)['results']
+        json_text = json.loads(resp_text)["results"]
         print(json_text)
-        self.assertTrue(len(json_text[0]['posts']) == 10)
-
+        self.assertTrue(len(json_text[0]["posts"]) == 10)
