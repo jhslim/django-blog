@@ -81,11 +81,16 @@ class RestApiTestCase(TestCase):
     def setUp(self):
         self.now = datetime.datetime.utcnow().replace(tzinfo=utc)
         self.timedelta = datetime.timedelta(15)
+        self.posts = None
+        self.categories = None
+
         author = User.objects.get(pk=1)
 
         # create category to test category api
         category = Category(name="Fake category", description="Testing api")
         category.save()
+        category2 = Category(name="Fake category again", description="Testing api again")
+        category2.save()
 
         for count in range(1, 11):
             post = Post(title="Post %d Title" % count, text="foo", author=author)
@@ -94,10 +99,13 @@ class RestApiTestCase(TestCase):
                 # publish the first five posts
                 pubdate = self.now - self.timedelta * count
                 post.published_date = pubdate
-
-            post.save()
-            category.posts.add(post)
-            post.save()
+                post.save()
+                category.posts.add(post)
+                post.save()
+            else:
+                post.save()
+                category2.posts.add(post)
+                post.save()
 
     def test_returned_api_users(self):
         resp = self.client.get("/api/users/")
@@ -111,9 +119,9 @@ class RestApiTestCase(TestCase):
     def test_returned_api_posts(self):
         resp = self.client.get("/api/posts/")
         resp_text = resp.content.decode(resp.charset)
-        json_text = json.loads(resp_text)["results"]
-        self.assertTrue(len(json_text) == 10)
-        for post in json_text:
+        self.posts = json.loads(resp_text)["results"]
+        self.assertTrue(len(self.posts) == 10)
+        for post in self.posts:
             self.assertTrue("url" in post.keys())
             self.assertTrue("title" in post.keys())
             self.assertTrue("text" in post.keys())
@@ -122,10 +130,23 @@ class RestApiTestCase(TestCase):
             self.assertTrue("modified_date" in post.keys())
             self.assertTrue("published_date" in post.keys())
             self.assertTrue("categories" in post.keys())
+            if self.posts.index(post) < 5:
+                self.assertTrue(post['published_date'] == None)
 
     def test_returned_api_categories(self):
         resp = self.client.get("/api/categories/")
         resp_text = resp.content.decode(resp.charset)
-        json_text = json.loads(resp_text)["results"]
-        print(json_text)
-        self.assertTrue(len(json_text[0]["posts"]) == 10)
+        self.categories = json.loads(resp_text)["results"]
+        self.assertTrue(len(self.categories[0]["posts"]) == 5)
+        self.assertTrue(len(self.categories[1]["posts"]) == 5)
+        self.assertTrue(self.categories[0]['url'] == "http://testserver/categories/1/")
+        self.assertTrue(self.categories[0]['name'] == "Fake category")
+        self.assertTrue(self.categories[0]['description'] == "Testing api")
+        self.assertTrue(self.categories[1]['url'] == "http://testserver/categories/2/")
+        self.assertTrue(self.categories[1]['name'] == "Fake category again")
+        self.assertTrue(self.categories[1]['description'] == "Testing api again")
+        for count in range(1, 11):
+            if count < 6:
+                self.assertTrue(f"http://testserver/posts/{count}/" in self.categories[0]["posts"])
+            else:
+                self.assertTrue(f"http://testserver/posts/{count}/" in self.categories[1]["posts"])
