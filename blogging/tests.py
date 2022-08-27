@@ -89,7 +89,9 @@ class RestApiTestCase(TestCase):
         # create category to test category api
         category = Category(name="Fake category", description="Testing api")
         category.save()
-        category2 = Category(name="Fake category again", description="Testing api again")
+        category2 = Category(
+            name="Fake category again", description="Testing api again"
+        )
         category2.save()
 
         for count in range(1, 11):
@@ -131,7 +133,7 @@ class RestApiTestCase(TestCase):
             self.assertTrue("published_date" in post.keys())
             self.assertTrue("categories" in post.keys())
             if self.posts.index(post) < 5:
-                self.assertTrue(post['published_date'] == None)
+                self.assertTrue(post["published_date"] == None)
 
     def test_returned_api_categories(self):
         resp = self.client.get("/api/categories/")
@@ -139,14 +141,18 @@ class RestApiTestCase(TestCase):
         self.categories = json.loads(resp_text)["results"]
         self.assertTrue(len(self.categories[0]["posts"]) == 5)
         self.assertTrue(len(self.categories[1]["posts"]) == 5)
-        self.assertTrue(self.categories[0]['url'] == "http://testserver/categories/1/")
-        self.assertTrue(self.categories[0]['name'] == "Fake category")
-        self.assertTrue(self.categories[0]['description'] == "Testing api")
-        self.assertTrue(self.categories[1]['url'] == "http://testserver/categories/2/")
-        self.assertTrue(self.categories[1]['name'] == "Fake category again")
-        self.assertTrue(self.categories[1]['description'] == "Testing api again")
+        self.assertTrue(self.categories[0]["url"] == "http://testserver/categories/1/")
+        self.assertTrue(self.categories[0]["name"] == "Fake category")
+        self.assertTrue(self.categories[0]["description"] == "Testing api")
+        self.assertTrue(self.categories[1]["url"] == "http://testserver/categories/2/")
+        self.assertTrue(self.categories[1]["name"] == "Fake category again")
+        self.assertTrue(self.categories[1]["description"] == "Testing api again")
         for count in range(1, 11):
             if count < 6:
-                self.assertTrue(f"http://testserver/posts/{count}/" in self.categories[0]["posts"])
+                self.assertTrue(
+                    f"http://testserver/posts/{count}/" in self.categories[0]["posts"]
+                )
             else:
-                self.assertTrue(f"http://testserver/posts/{count}/" in self.categories[1]["posts"])
+                self.assertTrue(
+                    f"http://testserver/posts/{count}/" in self.categories[1]["posts"]
+                )
