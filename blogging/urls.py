@@ -7,7 +7,6 @@ from blogging.views import (
     PostViewSet,
     CategoryViewSet,
 )
-from django.contrib.auth.views import LoginView, LogoutView
 
 
 router = routers.DefaultRouter()
@@ -20,8 +19,6 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("posts/<int:pk>/", BlogDetailView.as_view(), name="blog_detail"),
-    path("login", LoginView.as_view(template_name="login.html"), name="login"),
-    path("logout", LogoutView.as_view(template_name="logout.html"), name="logout"),
 ]
 
 urlpatterns += router.urls
